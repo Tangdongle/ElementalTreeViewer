@@ -4,7 +4,6 @@ from gi.repository import Gtk, GObject
 class MyWindow(Gtk.Window):
     def __init__(self):
         Gtk.Window.__init__(self, title="Hello World")
-        self.connect("delete-event", Gtk.main_quit)
         self.set_border_width(10)
 
         hbox = Gtk.Box(spacing=6)
@@ -35,5 +34,6 @@ class MyWindow(Gtk.Window):
 
 
 win = MyWindow()
+win.connect("delete-event", Gtk.main_quit)
 win.show_all()
 Gtk.main()
