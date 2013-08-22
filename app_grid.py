@@ -5,8 +5,8 @@ class MyWindow(Gtk.Window):
     def __init__(self):
         Gtk.Window.__init__(self, title="Hello World")
 
-        table = Gtk.Table(3, 3, True)
-        self.add(table)
+        grid = Gtk.Grid()
+        self.add(grid)
 
         button1 = Gtk.Button(label="Button 1")
         button2 = Gtk.Button(label="Button 2")
@@ -15,12 +15,13 @@ class MyWindow(Gtk.Window):
         button5 = Gtk.Button(label="Button 5")
         button6 = Gtk.Button(label="Button 6")
 
-        table.attach(button1, 0, 1, 0 ,1)
-        table.attach(button2, 1, 3, 0, 1)
-        table.attach(button3, 0, 1, 1, 3)
-        table.attach(button4, 1, 3, 1, 2)
-        table.attach(button5, 1, 2, 2, 3)
-        table.attach(button6, 2, 3, 2, 3)
+        grid.add(button1)
+        grid.attach(button2, 1, 0, 2, 1)
+        grid.attach_next_to(button3, button1, Gtk.PositionType.BOTTOM, 1, 2)
+        grid.attach_next_to(button4, button3, Gtk.PositionType.RIGHT, 2, 1)
+        grid.attach(button5, 1, 2, 1, 1)
+        grid.attach_next_to(button6, button5, Gtk.PositionType.RIGHT, 1, 1)
+
 
 win = MyWindow()
 win.connect("delete-event", Gtk.main_quit)
