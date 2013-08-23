@@ -1,38 +1,49 @@
 #!/usr/bin/env python
-from gi.repository import Gtk, GObject
+from gi.repository import Gtk, GObject, Gdk
+from gi.repository.GdkPixbuf import Pixbuf
 
 class MyWindow(Gtk.Window):
     def __init__(self):
+#setup
         Gtk.Window.__init__(self, title="Hello World")
         self.connect("delete-event", Gtk.main_quit)
-        self.set_border_width(10)
+        self.set_size_request(200, 400)
+        self.model = Gtk.TreeStore(str)
 
-        hbox = Gtk.Box(spacing=6)
-        self.add(hbox)
+        for parent in range(4):
+            piter = self.model.append(None, ['parent %i' % parent])
+            for child in range(3):
+                self.model.append(piter, ['child %i of parent %i' % (child, parent)])
 
-        adjustment = Gtk.Adjustment(0, 0, 100, 1, 10, 0)
-        self.spinbutton = Gtk.SpinButton()
-        self.spinbutton.set_adjustment(adjustment)
-        hbox.pack_start(self.spinbutton, False, False, 0)
+        self.treeview = Gtk.TreeView(self.model)
+        self.tree_selection = self.treeview.get_selection()
+        self.tree_selection.set_mode(Gtk.SelectionMode.SINGLE)
+        self.tree_selection.connect("changed", self.on_tree_selection_changed)
 
-        check_numeric = Gtk.CheckButton("Numeric")
-        check_numeric.connect("toggled", self.on_numeric_toggled)
-        hbox.pack_start(check_numeric, False, False, 0)
 
-        check_ifvalid = Gtk.CheckButton("If Valid")
-        check_ifvalid.connect("toggled", self.on_ifvalid_toggled)
-        hbox.pack_start(check_ifvalid, False, False, 0)
+        tvcolumn = Gtk.TreeViewColumn('Column 0')
+        self.treeview.append_column(tvcolumn)
 
-    def on_numeric_toggled(self, button):
-        self.spinbutton.set_numeric(button.get_active())
+        cell = Gtk.CellRendererText()
+        #cell.connect("clicked", self.did_click_element)
+        tvcolumn.pack_start(cell, True)
 
-    def on_ifvalid_toggled(self, button):
-        if button.get_active():
-            policy = Gtk.SpinButtonUpdatePolicy.IF_VALID
-        else:
-            policy = Gtk.SpinButtonUpdatePolicy.ALWAYS
-        self.spinbutton.set_update_policy(policy)
+        tvcolumn.add_attribute(cell, 'text', 0)
 
+        self.treeview.set_search_column(0)
+
+        tvcolumn.set_sort_column_id(0)
+
+        self.treeview.set_reorderable(True)
+        self.add(self.treeview)
+
+    def on_tree_selection_changed(self, selection):
+        model, treeiter = selection.get_selected()
+        if treeiter:
+            dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "You selected %s" % model[treeiter][0])
+            dialog.run()
+
+        dialog.destroy()
 
 win = MyWindow()
 win.show_all()
